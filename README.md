@@ -4,6 +4,7 @@ is a simple example / template for authentication (login)
 ## Technology Stack and Features
 - ⚡ [FastAPI](https://fastapi.tiangolo.com) for the Python API.
 - 📞 [Traefik](https://traefik.io) as a reverse proxy for SSL termination.
+- 🥷 [Jinja2Templates](https://fastapi.tiangolo.com/advanced/templates/) for html frontend.
 - 🐋 [Docker Compose](https://www.docker.com)
 - 🔒 [passlib](https://pypi.org/project/passlib/) for Secure password hashing.
 - 🍪 [python-jose](https://python-jose.readthedocs.io/en/latest/) for JWT token authentication.
