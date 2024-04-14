@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+
+  traefik:
+    image: traefik:v2.5
+    container_name: reverse-proxy 
+    command:
+      - "--api.insecure=true"   # Disable this in production
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory" # Use staging server
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./self-signed-cert:/certs"  # Mount the directory containing self-signed certificate
+    # Add a comment explaining the self-signed certificate
+    # Generate a self-signed certificate using OpenSSL:
+    # openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./self-signed-cert/selfsigned.key -out ./self-signed-cert/selfsigned.crt
+
+  fastapi-app-container:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    command: gunicorn -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 --timeout 480 app.main:app
+    volumes:
+      - .:/app/
+    image: fastapi-app-image
+    container_name: fastapi-app-container
+    ports:
+      - 8011:8000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fastapi-app.rule=Host(`127.0.0.1`)"
+      - "traefik.http.routers.fastapi-app.entrypoints=web"
+      - "traefik.http.services.fastapi-app.loadbalancer.server.port=8000"
+      - "traefik.http.routers.fastapi-app.tls.certresolver=myresolver"  # Use the same resolver name as defined in Traefik
+    env_file:
+      - ./app/.env.dev

@@ -1,0 +1,12 @@
+{
+    "db": [
+        {
+            "username": "user1",
+            "hashed_password": "$2b$12$Iz5DchVZE.9w.Gb0TznpXe9s3Ud1iDhTm1ewBHTCS8BlbZIlahqTS"
+        },
+        {
+            "username": "user2",
+            "hashed_password": "$2b$12$n2oED.41O5c0EjPgltaajePpDucEYLNoY5kmxhsKRsoxLkIv1F.dW"
+        }
+    ]
+}

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta content="width=device-width, initial-scale=1.0">
+    <title>Table</title>
+</head>
+<body>
+
+<table border="1">
+    <tr>
+        {% for column_name in columns %}
+            <th>{{ column_name }}</th>
+        {% endfor %}
+    </tr>
+    {% for row in data %}
+        <tr>
+            {% for column_name in columns %}
+                <td>{{ row[column_name] }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>
