@@ -36,4 +36,4 @@ docker-compose -f docker-compose.staging.yml up
 ## TODOS
 - add local [traefik](https://doc.traefik.io/traefik/getting-started/quick-start/)
 - add a [PostgreSQL](https://www.postgresql.org) database with [Pydantic](https://docs.pydantic.dev) for data validation, instead of json as "database"
-- add better tests
+- add working tests and document usage in README
