@@ -15,31 +15,36 @@ is a simple example / template for authentication (login)
 
 ## Quick start / Usage
 
-### direct on server
-- clone repo
-- change line 34 of docker.compose.staging.yml
-    - "traefik.http.routers.db-access.rule=Host(`your-domain.com`)" # change `your-domain.com` to your domain
-- start docker 
+### local without reverse-proxy
+- cloe repo
 ```bash
 git clone https://github.com/matsjfunke/fastapi-login-traefik.git
-docker-compose -f docker-compose.staging.yml up
 ```
-than access the page https:/your-domain.com and enter the credentails "user1" and "foo" from the [json-db](https://github.com/matsjfunke/fastapi-login-traefik/blob/main/app/user_db.json)
+- start container
+```bash
+docker-compose -f docker-compose.yml up --build
+```
+- than access the page 127.0.0.1:3000/login and enter the credentails "user1" and "foo" from the [json-db](https://github.com/matsjfunke/fastapi-login-traefik/blob/main/app/user_db.json)
 
-### local:
+### on server
 - clone repo
 - change line 34 of docker.compose.staging.yml
     - "traefik.http.routers.db-access.rule=Host(`your-domain.com`)" # change `your-domain.com` to your domain
-- rsync to server
 - start docker 
 ```bash
 git clone https://github.com/matsjfunke/fastapi-login-traefik.git
-rsync -av -e "ssh -i ~/.ssh/your-key.pem"  --exclude=__pycache__ --exclude=env  fastapi-login-traefik your-usr@your-server.com:dir
 docker-compose -f docker-compose.staging.yml up
 ```
-than access the page https:/your-domain.com and enter the credentails "user1" and "foo" from the [json-db](https://github.com/matsjfunke/fastapi-login-traefik/blob/main/app/user_db.json)
+- than access the page https:/your-domain.com and enter the credentails "user1" and "foo" from the [json-db](https://github.com/matsjfunke/fastapi-login-traefik/blob/main/app/user_db.json)
+
+### Add new users to the database
+- uncomment the password_encryption route as explained in the main.py 
+- access localhost:3000/create-password
+- enter new password
+- copy the hashed password
+- add hashed password and new username in json-db
+- docker-compose up -> login in with them
 
 ## TODOS
-- get local test to work & replace ngnix-proxy with [traefik](https://doc.traefik.io/traefik/getting-started/quick-start/) in docker-compose.yml
 - add a [PostgreSQL](https://www.postgresql.org) database with [Pydantic](https://docs.pydantic.dev) for data validation, instead of json as "database"
 - add working tests and document usage in README

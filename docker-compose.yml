@@ -12,28 +12,6 @@ services:
     image: db-access-image
     container_name: db-access-container
     ports:
-      - 8011:8000
-    networks:
-      - aime-pserver_default
+      - 3000:8000
     env_file:
       - ./app/.env.dev
-
-  nginx-proxy:
-    build: ./nginx
-    container_name: nginx-proxy
-    ports:
-      - 81:80
-      - 443:443
-    environment:
-      - TRUST_DOWNSTREAM_PROXY=false
-    env_file:
-      - ./app/.env.dev
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ./nginx/custom_proxy_settings.conf:/etc/nginx/conf.d/custom_proxy_settings.conf
-    networks:
-      - aime-pserver_default
-
-networks:
-  aime-pserver_default:
-    external: true

@@ -2,26 +2,25 @@
 matsjfunke
 """
 import os
-from datetime import datetime, timedelta
+from datetime import timedelta
 
-from fastapi import FastAPI, Depends, Form, HTTPException, Request, status, Query
-from fastapi.responses import HTMLResponse, JSONResponse
-
+from fastapi import FastAPI, Form, HTTPException, Request, status, Query
+from fastapi.responses import HTMLResponse
 from starlette.responses import RedirectResponse
-from starlette.status import HTTP_308_PERMANENT_REDIRECT
 
 from fastapi.templating import Jinja2Templates
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jose import JWTError, jwt
 
-# importing authentication functions from authentication.py
-from .authentication import authenticate_user, create_access_token, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, json_db
+# authentication imports
+from .authentication import authenticate_user, create_access_token, vaildate_cookies, ACCESS_TOKEN_EXPIRE_MINUTES, json_db
+from fastapi.security import OAuth2PasswordBearer
 
 # uncomment this to enable enpoint /create-password which hashes password
-# from .password_encryption import router as password_router
-# add app.include_router(password_router) in line after app = FastAPI()
+from .password_encryption import router as password_router
+
 
 app = FastAPI()
+app.include_router(password_router)
+
 
 # Initialize template directory relative to the current file location
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -37,8 +36,8 @@ async def login_form(request: Request):
 
 
 @app.post("/login")
-async def login(username: str = Form(...), password: str = Form(...), time_frame: str = Form(...)):
-    print("login post")
+async def login(username: str = Form(...), password: str = Form(...)):
+    print("post login")
     user = authenticate_user(username, password, json_db)
     if user is None:
         print("login failed incorrect username or output")
@@ -52,7 +51,7 @@ async def login(username: str = Form(...), password: str = Form(...), time_frame
     print("login successful, cookie created")
 
     # set url here:
-    redirect_url = f"/hello?time_frame={time_frame}"
+    redirect_url = f"/hello?username={username}"
 
     response = RedirectResponse(url=redirect_url, status_code=status.HTTP_308_PERMANENT_REDIRECT)
     response.set_cookie(key="access_token", value=access_token)
@@ -63,23 +62,13 @@ async def login(username: str = Form(...), password: str = Form(...), time_frame
     return response
 
 
+# without post now refresh
+@app.get("/hello")
 @app.post("/hello")
-def hello(request: Request, time_frame: str = Query(...)):
+def hello(request: Request, username: str = Query(...)):
+    # authentication part
+    vaildate_cookies(request.cookies.get("access_token"))
+
+    # just for output
     access_token = request.cookies.get("access_token")
-    if access_token is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="no cookies, in your jar",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    print("access_token", access_token)
-
-    try:
-        payload = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
-        username = payload.get("sub")
-        if not username:
-            raise HTTPException(status_code=401, detail="Invalid token")
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
-
-    return {"hello": "world", "time_frame": time_frame, "access_token": access_token}
+    return templates.TemplateResponse("hello.html", {"request": request, "username": username, "access_token": access_token})
