@@ -45,6 +45,12 @@ docker-compose -f docker-compose.staging.yml up
 - add hashed password and new username in json-db
 - docker-compose up -> login in with them
 
+## Test
+use the test script to check if the login works
+```bash
+pip install selenium
+python tests/loging-test.py
+```
+
 ## TODOS
 - add a [PostgreSQL](https://www.postgresql.org) database with [Pydantic](https://docs.pydantic.dev) for data validation, instead of json as "database"
-- add working tests and document usage in README
