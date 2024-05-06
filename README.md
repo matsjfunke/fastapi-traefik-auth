@@ -24,7 +24,7 @@ git clone https://github.com/matsjfunke/fastapi-login-traefik.git
 ```bash
 docker-compose -f docker-compose.yml up --build
 ```
-- than access the page 127.0.0.1:3000/login and enter the credentails "user1" and "foo" from the [json-db](https://github.com/matsjfunke/fastapi-login-traefik/blob/main/app/user_db.json)
+- than access the page 127.0.0.1:8000/login and enter the credentails "user1" and "foo" from the [json-db](https://github.com/matsjfunke/fastapi-login-traefik/blob/main/app/user_db.json)
 
 ### on server
 - clone repo
@@ -39,7 +39,7 @@ docker-compose -f docker-compose.staging.yml up
 
 ### Add new users to the database
 - uncomment the password_encryption route as explained in the main.py 
-- access localhost:3000/create-password
+- access localhost:8000/create-password
 - enter new password
 - copy the hashed password
 - add hashed password and new username in json-db
