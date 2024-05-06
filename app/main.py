@@ -19,8 +19,9 @@ from .account_creation import hash_password
 from .db import models, database
 from .db.schemas import User
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 from typing import List
-
+from contextlib import contextmanager
 
 app = FastAPI()
 
@@ -33,11 +34,18 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 # Dependency to get the database session
+@contextmanager
 def get_db():
     db = database.SessionLocal()
     try:
         yield db
+    except SQLAlchemyError as e:
+        # Handle the exception, log it, or perform any necessary cleanup
+        print(f"Database error: {e}")
+        # Rollback the transaction if needed
+        db.rollback()
     finally:
+        # Close the session to release resources
         db.close()
 
 
@@ -53,19 +61,17 @@ async def sign_up_form(request: Request):
 
 @app.post("/sign-up")
 async def create_user(username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
-    # Check if username already exists
-    existing_user = db.query(models.User).filter(models.User.username == username).first()
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Username already registered")
+    # Use the database session within a 'with' statement
+    with db as session:
+        existing_user = session.query(models.User).filter(models.User.username == username).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Username already registered")
 
-    # Hash the password
-    hashed_password = hash_password(password)
-
-    # Create user in the database
-    new_user = models.User(username=username, hashed_password=hashed_password)
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+        hashed_password = hash_password(password)
+        new_user = models.User(username=username, hashed_password=hashed_password)
+        session.add(new_user)
+        session.commit()
+        session.refresh(new_user)
 
     return {"message": "User created successfully"}
 
@@ -73,8 +79,10 @@ async def create_user(username: str = Form(...), password: str = Form(...), db: 
 # Endpoint to get all users
 @app.get("/users/", response_model=List[User])
 async def get_all_users(db: Session = Depends(get_db)):
-    users = db.query(models.User).all()
-    return users
+    # Use the database session within a 'with' statement
+    with db as session:
+        users = session.query(models.User).all()
+        return users
 
 
 @app.get("/login", response_class=HTMLResponse)
