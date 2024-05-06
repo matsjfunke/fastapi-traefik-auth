@@ -14,12 +14,11 @@ from fastapi.templating import Jinja2Templates
 from .authentication import authenticate_user, create_access_token, vaildate_cookies, ACCESS_TOKEN_EXPIRE_MINUTES, json_db
 from fastapi.security import OAuth2PasswordBearer
 
-# uncomment this to enable enpoint /create-password which hashes password
-from .password_encryption import router as password_router
+# sgin-up imports
+from .account_creation import hash_password
 
 
 app = FastAPI()
-app.include_router(password_router)
 
 
 # Initialize template directory relative to the current file location
@@ -33,6 +32,12 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 async def sign_up_form(request: Request):
     print("get sign-up")
     return templates.TemplateResponse("sign-up.html", {"request": request})
+
+
+@app.post("/sign-up")
+async def create_account(username: str = Form(...), password: str = Form(...)):
+    hash = hash_password(password)
+    return {"hash_password": hash}
 
 
 @app.get("/login", response_class=HTMLResponse)
