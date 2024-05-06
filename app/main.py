@@ -29,6 +29,12 @@ templates = Jinja2Templates(directory=os.path.join(current_dir, "templates"))
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
+@app.get("/sign-up", response_class=HTMLResponse)
+async def sign_up_form(request: Request):
+    print("get sign-up")
+    return templates.TemplateResponse("sign-up.html", {"request": request})
+
+
 @app.get("/login", response_class=HTMLResponse)
 async def login_form(request: Request):
     print("get login")
