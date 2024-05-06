@@ -1,6 +1,7 @@
 """
 matsjfunke
 """
+import re
 import os
 from datetime import timedelta
 
@@ -59,13 +60,26 @@ async def sign_up_form(request: Request):
     return templates.TemplateResponse("sign-up.html", {"request": request})
 
 
+USERNAME_REGEX = r'^[^\W_][\w]*$'
+
 @app.post("/sign-up")
 async def create_user(username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
-    # Use the database session within a 'with' statement
     with db as session:
+
+        # duplicate vaildation
         existing_user = session.query(models.User).filter(models.User.username == username).first()
         if existing_user:
             raise HTTPException(status_code=400, detail="Username already registered")
+
+        # length vaildation
+        if len(username) < 4:
+            raise HTTPException(status_code=400, detail="Username must be at least 4 characters long")
+        if len(password) < 6:
+            raise HTTPException(status_code=400, detail="Password must be at least 6 characters long")
+
+        # Validation of username format
+        if not re.match(USERNAME_REGEX, username):
+            raise HTTPException(status_code=400, detail="Username contains invalid characters")
 
         hashed_password = hash_password(password)
         new_user = models.User(username=username, hashed_password=hashed_password)
@@ -74,6 +88,7 @@ async def create_user(username: str = Form(...), password: str = Form(...), db: 
         session.refresh(new_user)
 
     return {"message": "User created successfully"}
+
 
 
 # Endpoint to get all users
