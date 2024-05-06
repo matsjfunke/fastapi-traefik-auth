@@ -9,11 +9,15 @@
 
 <body>
 
+    <h1>Enter username and password to create an account</h1>
+
     <form action="/sign-up" method="POST" enctype="application/x-www-form-urlencoded">
-        <input type="text" name="username" placeholder="username">
-        <input type="password" name="password" placeholder="password">
+        <input type="text" name="username" placeholder="username (min 4 characters)">
+        <input type="password" name="password" placeholder="password (min 6 characters)">
         <input type="submit" value="Submit" id="submit">
     </form>
+
+    <a href="login" class="btn">already have an account? sign-in</a>
 
 </body>
 

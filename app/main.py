@@ -61,13 +61,13 @@ async def sign_up_form(request: Request):
 
 
 @app.post("/sign-up")
-async def create_user(username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+async def create_user(request: Request, username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
     print("creating account...")
     with db as session:
         username, password = create_new_user(username, password, session)
         new_user = save_new_user(username, password, session)
-    print("saved user to db\n")
-    return {"message": "User created successfully", "user": new_user}
+    print(f"saved user {new_user.username} with ID {new_user.id} to db\n")
+    return templates.TemplateResponse("login.html", {"request": request})
 
 
 # Endpoint to get all users
