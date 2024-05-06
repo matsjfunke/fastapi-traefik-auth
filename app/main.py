@@ -4,7 +4,7 @@ matsjfunke
 import os
 from datetime import timedelta
 
-from fastapi import FastAPI, Form, HTTPException, Request, status, Query
+from fastapi import FastAPI, Form, HTTPException, Request, status, Query, Depends
 from fastapi.responses import HTMLResponse
 from starlette.responses import RedirectResponse
 
@@ -14,8 +14,12 @@ from fastapi.templating import Jinja2Templates
 from .authentication import authenticate_user, create_access_token, vaildate_cookies, ACCESS_TOKEN_EXPIRE_MINUTES, json_db
 from fastapi.security import OAuth2PasswordBearer
 
-# sgin-up imports
+# account creation imports
 from .account_creation import hash_password
+from .db import models, database
+from .db.schemas import User
+from sqlalchemy.orm import Session
+from typing import List
 
 
 app = FastAPI()
@@ -28,16 +32,49 @@ templates = Jinja2Templates(directory=os.path.join(current_dir, "templates"))
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-@app.get("/sign-up", response_class=HTMLResponse)
+# Dependency to get the database session
+def get_db():
+    db = database.SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+# Create the tables
+models.Base.metadata.create_all(bind=database.engine)
+
+
+@app.get("/", response_class=HTMLResponse)
 async def sign_up_form(request: Request):
     print("get sign-up")
     return templates.TemplateResponse("sign-up.html", {"request": request})
 
 
 @app.post("/sign-up")
-async def create_account(username: str = Form(...), password: str = Form(...)):
-    hash = hash_password(password)
-    return {"hash_password": hash}
+async def create_user(username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+    # Check if username already exists
+    existing_user = db.query(models.User).filter(models.User.username == username).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Username already registered")
+
+    # Hash the password
+    hashed_password = hash_password(password)
+
+    # Create user in the database
+    new_user = models.User(username=username, hashed_password=hashed_password)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return {"message": "User created successfully"}
+
+
+# Endpoint to get all users
+@app.get("/users/", response_model=List[User])
+async def get_all_users(db: Session = Depends(get_db)):
+    users = db.query(models.User).all()
+    return users
 
 
 @app.get("/login", response_class=HTMLResponse)
