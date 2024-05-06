@@ -16,7 +16,7 @@ from .authentication import authenticate_user, create_access_token, vaildate_coo
 from fastapi.security import OAuth2PasswordBearer
 
 # account creation imports
-from .account_creation import hash_password
+from .account_creation import create_new_user, save_new_user
 from .db import models, database
 from .db.schemas import User
 from sqlalchemy.orm import Session
@@ -60,35 +60,14 @@ async def sign_up_form(request: Request):
     return templates.TemplateResponse("sign-up.html", {"request": request})
 
 
-USERNAME_REGEX = r'^[^\W_][\w]*$'
-
 @app.post("/sign-up")
 async def create_user(username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+    print("creating account...")
     with db as session:
-
-        # duplicate vaildation
-        existing_user = session.query(models.User).filter(models.User.username == username).first()
-        if existing_user:
-            raise HTTPException(status_code=400, detail="Username already registered")
-
-        # length vaildation
-        if len(username) < 4:
-            raise HTTPException(status_code=400, detail="Username must be at least 4 characters long")
-        if len(password) < 6:
-            raise HTTPException(status_code=400, detail="Password must be at least 6 characters long")
-
-        # Validation of username format
-        if not re.match(USERNAME_REGEX, username):
-            raise HTTPException(status_code=400, detail="Username contains invalid characters")
-
-        hashed_password = hash_password(password)
-        new_user = models.User(username=username, hashed_password=hashed_password)
-        session.add(new_user)
-        session.commit()
-        session.refresh(new_user)
-
-    return {"message": "User created successfully"}
-
+        username, password = create_new_user(username, password, session)
+        new_user = save_new_user(username, password, session)
+    print("saved user to db\n")
+    return {"message": "User created successfully", "user": new_user}
 
 
 # Endpoint to get all users
@@ -129,7 +108,7 @@ async def login(username: str = Form(...), password: str = Form(...)):
 
     print("Response content before returning: ", response)
     print("Redirect URL:", response.headers["location"])
-    print("Status Code:", response.status_code)
+    print(f"Status Code: {response.status_code}\n")
     return response
 
 
