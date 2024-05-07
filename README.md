@@ -60,6 +60,10 @@ python tests/signup_test.py
 ```bash
 python tests/login_test.py
 ``` 
+4. test deletion function
+```bash
+python test/deletion_test.py
+```
 
 
 ## TODOS
