@@ -50,6 +50,18 @@ def save_new_user(username: str, password: str, session: Session):
     return new_user
 
 
+def update_username(existing_username: str, new_username: str, session: Session):
+    try:
+        # Check if the existing username exists in the database
+        user_to_update = session.query(models.User).filter_by(username=existing_username).one()
+        # Update the username
+        user_to_update.username = new_username
+        session.commit()
+        return HTTPException(status_code=200, detail=f"Username updated from {existing_username} to {new_username}")
+    except NoResultFound:
+        return HTTPException(status_code=400, detail=f"The user: {existing_username} you are trying to update doesn't exist")
+
+
 def delete_user(username: str, session: Session):
     try:
         user_to_delete = session.query(models.User).filter_by(username=username).one()

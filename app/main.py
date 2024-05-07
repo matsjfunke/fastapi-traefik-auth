@@ -8,6 +8,7 @@ from typing import List
 from fastapi import FastAPI, Form, HTTPException, Request, status, Query, Depends, Response
 from fastapi.responses import HTMLResponse
 from starlette.responses import RedirectResponse
+from starlette import status
 
 from fastapi.templating import Jinja2Templates
 
@@ -16,7 +17,7 @@ from .authentication import authenticate_user, create_access_token, vaildate_coo
 from fastapi.security import OAuth2PasswordBearer
 
 # database related imports
-from .account_management import create_new_user, save_new_user, delete_user
+from .account_management import create_new_user, save_new_user, update_username, delete_user
 from .db import models, database
 from .db.schemas import User
 from sqlalchemy.orm import Session
@@ -123,12 +124,25 @@ async def get_all_users(request: Request, db: Session = Depends(get_db)):
         return users
 
 
+@app.post("/update_username")
+async def update_username_in_db(request: Request, old_username: str = Form(...), new_username: str = Form(...), db: Session = Depends(get_db)):
+    vaildate_cookies(request.cookies.get("access_token"))
+
+    with db as session:
+        update_username(old_username, new_username, session)
+        print(f"updated username: {old_username} to {new_username}")
+
+        redirect_url = f"hello?username={new_username}"
+    return RedirectResponse(redirect_url)
+
+
 @app.post("/delete_user")
 async def delete_user_credentails(request: Request, response: Response, username: str = Form(...), db: Session = Depends(get_db)):
     vaildate_cookies(request.cookies.get("access_token"))
 
     with db as session:
         status = delete_user(username, session)
+        print(f"deleted user {username}")
 
     response.delete_cookie("access_token")
     return status
