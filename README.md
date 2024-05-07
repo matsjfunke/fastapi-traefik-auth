@@ -29,6 +29,7 @@ docker-compose -f docker-compose.yml up --build
 ```
 - than access the localhost:8000 and submit username and password, then enter your credentials at localhost:8000/login 
 - now with the cookies you obtained through logging in you can access the /hello and /users endpoints
+- at /hello you can delete your username, password & cookies or update your username 
  
 
 #### 2. run on server
@@ -40,9 +41,9 @@ docker-compose -f docker-compose.yml up --build
 git clone https://github.com/matsjfunke/fastapi-login-traefik.git
 docker-compose -f docker-compose.staging.yml up
 ```
-- than access the localhost:8000 and submit username and password, then enter your credentials at localhost:8000/login 
+- than access the `your-domain.com` and submit username and password, then enter your credentials at `your-domain.com/login` 
 - now with the cookies you obtained through logging in you can access the /hello and /users endpoints
-
+- at /hello you can delete your username, password & cookies or update your username
 
 ## Test the Code
 test all CRUD functions in this order
