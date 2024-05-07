@@ -11,6 +11,9 @@ is a simple example / template for authentication (login)
 - 🥷 [Jinja2Templates](https://fastapi.tiangolo.com/advanced/templates/) for rendering dynamic HTML content, making it easy to create user interfaces.
 - 🍪 [python-jose](https://python-jose.readthedocs.io/en/latest/) for secure user authentication using JSON Web Tokens (JWT), ensuring that only authenticated users can access protected routes.
 - 🔒 [passlib](https://pypi.org/project/passlib/) for secure password hashing and verification.
+- 🗃️ [SQLite Database](https://www.sqlite.org/) for storing usernames and hashed passwords.
+- 🛠️ [SQLAlchemy](https://www.sqlalchemy.org/) as an ORM for working with the database.
+- 🛡️ [Pydantic](https://docs.pydantic.dev) for data validation.
 - 🐋 [Docker Compose](https://www.docker.com) deploy and manage your application using Docker-compose, allowing for seamless containerization and orchestration of your services.
 
 ## Quick start / Usage
@@ -24,8 +27,9 @@ git clone https://github.com/matsjfunke/fastapi-login-traefik.git
 ```bash
 docker-compose -f docker-compose.yml up --build
 ```
-- than access the page 127.0.0.1:8000/login and enter the credentails "user1" and "foo" from the [json-db](https://github.com/matsjfunke/fastapi-login-traefik/blob/main/app/user_db.json)
-
+- than access the localhost:8000 and submit username and password, then enter your credentials at localhost:8000/login 
+- now with the cookies you obtained through logging in you can access the /hello and /users endpoints
+ 
 ### on server
 - clone repo
 - change line 34 of docker.compose.staging.yml
@@ -35,23 +39,9 @@ docker-compose -f docker-compose.yml up --build
 git clone https://github.com/matsjfunke/fastapi-login-traefik.git
 docker-compose -f docker-compose.staging.yml up
 ```
-- than access the page https:/your-domain.com and enter the credentails "user1" and "foo" from the [json-db](https://github.com/matsjfunke/fastapi-login-traefik/blob/main/app/user_db.json)
+- than access the localhost:8000 and submit username and password, then enter your credentials at localhost:8000/login 
+- now with the cookies you obtained through logging in you can access the /hello and /users endpoints
 
-### Add new users to the JSON database
-- uncomment the password_encryption route as explained in the main.py 
-- access localhost:8000/create-password
-- enter new password
-- copy the hashed password
-- add hashed password and new username in json-db
-- docker-compose up -> login in with them
-
-### Add new users to sqlite database
-- start container:
-  docker-compose up --build
-- access localhost:8000:
-  enter username and password
-- vaildate account creation / get list of all users in the database:
-  access localhost:8000/users/
   
 ## Test
 use the test script to check if the login works
@@ -61,4 +51,4 @@ python tests/loging-test.py
 ```
 
 ## TODOS
-- add a [PostgreSQL](https://www.postgresql.org) database with [Pydantic](https://docs.pydantic.dev) for data validation, instead of json as "database"
+- add a [PostgreSQL](https://www.postgresql.org) database example
