@@ -5,7 +5,7 @@ import os
 from datetime import timedelta
 from typing import List
 
-from fastapi import FastAPI, Form, HTTPException, Request, status, Query, Depends
+from fastapi import FastAPI, Form, HTTPException, Request, status, Query, Depends, Response
 from fastapi.responses import HTMLResponse
 from starlette.responses import RedirectResponse
 
@@ -103,7 +103,7 @@ async def authentication_cookie_creation(username: str = Form(...), password: st
 # without post now refresh
 @app.get("/hello")
 @app.post("/hello")
-def hello(request: Request, username: str = Query(...)):
+async def hello(request: Request, username: str = Query(...)):
     # authenticate users cookies
     vaildate_cookies(request.cookies.get("access_token"))
 
@@ -124,9 +124,11 @@ async def get_all_users(request: Request, db: Session = Depends(get_db)):
 
 
 @app.post("/delete_user")
-async def delete_user_credentails(request: Request, username: str = Form(...), db: Session = Depends(get_db)):
+async def delete_user_credentails(request: Request, response: Response, username: str = Form(...), db: Session = Depends(get_db)):
     vaildate_cookies(request.cookies.get("access_token"))
 
     with db as session:
         status = delete_user(username, session)
+
+    response.delete_cookie("access_token")
     return status
