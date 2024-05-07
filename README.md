@@ -3,18 +3,18 @@
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
 
-is a simple example / template for authentication (login)   
+is a simple example / template for authentication   
 
 ## Technology Stack and Features
-- ⚡ [FastAPI](https://fastapi.tiangolo.com) a high-performance, web framework for building APIs with Python 3.7+.
-- 📞 [Traefik](https://traefik.io) a modern reverse proxy and load balancer, providing automatic HTTPS encryption and certificate management.
+- ⚡ [FastAPI](https://fastapi.tiangolo.com) for building APIs with Python 3.7+.
+- 📞 [Traefik](https://traefik.io) as reverse proxy and load balancer, providing automatic HTTPS encryption and certificate management.
 - 🥷 [Jinja2Templates](https://fastapi.tiangolo.com/advanced/templates/) for rendering dynamic HTML content, making it easy to create user interfaces.
 - 🍪 [python-jose](https://python-jose.readthedocs.io/en/latest/) for secure user authentication using JSON Web Tokens (JWT), ensuring that only authenticated users can access protected routes.
 - 🔒 [passlib](https://pypi.org/project/passlib/) for secure password hashing and verification.
 - 🗃️ [SQLite Database](https://www.sqlite.org/) for storing usernames and hashed passwords.
 - 🛠️ [SQLAlchemy](https://www.sqlalchemy.org/) as an ORM for working with the database.
 - 🛡️ [Pydantic](https://docs.pydantic.dev) for data validation.
-- 🐋 [Docker Compose](https://www.docker.com) deploy and manage your application using Docker-compose, allowing for seamless containerization and orchestration of your services.
+- 🐋 [Docker Compose](https://www.docker.com) to deploy and manage your application, allowing for containerization and orchestration of your services.
 
 ## Quick start / Usage
 
