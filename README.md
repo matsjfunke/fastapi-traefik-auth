@@ -45,7 +45,7 @@ docker-compose -f docker-compose.staging.yml up
 
 
 ## Test the Code
-
+test all CRUD functions in this order
 1. install dependency’s
 ```bash
 python3 -m venv env
@@ -59,12 +59,12 @@ python tests/signup_test.py
 3. test authentication with the prior created username & password
 ```bash
 python tests/login_test.py
+```
+4. test update_username function
+```bash
+python tests/update_name_test.py
 ``` 
-4. test deletion function
+5. test deletion function
 ```bash
 python test/deletion_test.py
 ```
-
-
-## TODOS
-- add a [PostgreSQL](https://www.postgresql.org) database example
