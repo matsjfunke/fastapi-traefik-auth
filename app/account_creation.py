@@ -28,10 +28,10 @@ def create_new_user(username: str, password: str, session: Session):
         raise HTTPException(status_code=400, detail="Username already registered")
 
     # Length validation
-    if len(username) < 4:
-        raise HTTPException(status_code=400, detail="Username must be at least 4 characters long")
-    if len(password) < 6:
-        raise HTTPException(status_code=400, detail="Password must be at least 6 characters long")
+    if len(username) < 3:
+        raise HTTPException(status_code=400, detail="Username must be at least 3 characters long")
+    if len(password) < 3:
+        raise HTTPException(status_code=400, detail="Password must be at least 3 characters long")
 
     # Validation of username format
     if not re.match(USERNAME_REGEX, username):

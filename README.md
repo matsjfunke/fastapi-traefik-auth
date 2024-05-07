@@ -43,13 +43,24 @@ docker-compose -f docker-compose.staging.yml up
 - than access the localhost:8000 and submit username and password, then enter your credentials at localhost:8000/login 
 - now with the cookies you obtained through logging in you can access the /hello and /users endpoints
 
-  
-## Test
-use the test script to check if the login works
+
+## Test the Code
+
+1. install dependency’s
 ```bash
+python3 -m venv env
+source env/bin/activate
 pip install selenium
-python tests/loging-test.py
 ```
+2. test if user credentials get saved to db
+```bash
+python tests/signup_test.py
+```
+3. test authentication with the prior created username & password
+```bash
+python tests/login_test.py
+``` 
+
 
 ## TODOS
 - add a [PostgreSQL](https://www.postgresql.org) database example

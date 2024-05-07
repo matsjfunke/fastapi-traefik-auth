@@ -3,6 +3,7 @@ matsjfunke
 """
 import os
 from datetime import timedelta
+from typing import List
 
 from fastapi import FastAPI, Form, HTTPException, Request, status, Query, Depends
 from fastapi.responses import HTMLResponse
@@ -20,7 +21,6 @@ from .db import models, database
 from .db.schemas import User
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-from typing import List
 from contextlib import contextmanager
 
 app = FastAPI()
