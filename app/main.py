@@ -1,7 +1,6 @@
 """
 matsjfunke
 """
-import re
 import os
 from datetime import timedelta
 
@@ -12,7 +11,7 @@ from starlette.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 # authentication imports
-from .authentication import authenticate_user, create_access_token, vaildate_cookies, ACCESS_TOKEN_EXPIRE_MINUTES, json_db, user_lookup
+from .authentication import authenticate_user, create_access_token, vaildate_cookies, ACCESS_TOKEN_EXPIRE_MINUTES
 from fastapi.security import OAuth2PasswordBearer
 
 # account creation imports
@@ -41,26 +40,15 @@ def get_db():
     try:
         yield db
     except SQLAlchemyError as e:
-        # Handle the exception, log it, or perform any necessary cleanup
         print(f"Database error: {e}")
-        # Rollback the transaction if needed
         db.rollback()
     finally:
         # Close the session to release resources
         db.close()
 
 
-# Create the tables
+# Create the tables on startup
 models.Base.metadata.create_all(bind=database.engine)
-
-
-@app.post("/test")
-async def test_function(username: str = Form(...), db: Session = Depends(get_db)):
-    print("Test")
-    with db as session:
-        x = user_lookup(username, session)
-        print(x)
-    return {"user": x}
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -79,15 +67,6 @@ async def create_user(request: Request, username: str = Form(...), password: str
     return templates.TemplateResponse("login.html", {"request": request})
 
 
-# Endpoint to get all users
-@app.get("/users/", response_model=List[User])
-async def get_all_users(db: Session = Depends(get_db)):
-    # Use the database session within a 'with' statement
-    with db as session:
-        users = session.query(models.User).all()
-        return users
-
-
 @app.get("/login", response_class=HTMLResponse)
 async def login_form(request: Request):
     print("get login")
@@ -95,29 +74,29 @@ async def login_form(request: Request):
 
 
 @app.post("/login")
-async def login(username: str = Form(...), password: str = Form(...)):
+async def authentication_cookie_creation(username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
     print("post login")
-    user = authenticate_user(username, password, json_db)
-    if user is None:
-        print("login failed incorrect username or output")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    with db as session:
+        username = authenticate_user(username, password, session)
+        if username is None:
+            print("login failed incorrect username or output")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect username or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
-    access_token = create_access_token(data={"sub": user["username"]}, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    print("login successful, cookie created")
+        access_token = create_access_token(data={"sub": username}, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+        print("login successful, cookie created")
 
-    # set url here:
-    redirect_url = f"/hello?username={username}"
+        # set url here:
+        redirect_url = f"/hello?username={username}"
 
-    response = RedirectResponse(url=redirect_url, status_code=status.HTTP_308_PERMANENT_REDIRECT)
-    response.set_cookie(key="access_token", value=access_token)
+        response = RedirectResponse(url=redirect_url, status_code=status.HTTP_308_PERMANENT_REDIRECT)
+        response.set_cookie(key="access_token", value=access_token)
 
-    print("Response content before returning: ", response)
-    print("Redirect URL:", response.headers["location"])
-    print(f"Status Code: {response.status_code}\n")
+        print("Redirect URL:", response.headers["location"])
+        print(f"Status Code: {response.status_code}\n")
     return response
 
 
@@ -125,9 +104,20 @@ async def login(username: str = Form(...), password: str = Form(...)):
 @app.get("/hello")
 @app.post("/hello")
 def hello(request: Request, username: str = Query(...)):
-    # authentication part
+    # authenticate users cookies
     vaildate_cookies(request.cookies.get("access_token"))
 
     # just for output
     access_token = request.cookies.get("access_token")
     return templates.TemplateResponse("hello.html", {"request": request, "username": username, "access_token": access_token})
+
+
+# Endpoint to get all users
+@app.get("/users/", response_model=List[User])
+async def get_all_users(request: Request, db: Session = Depends(get_db)):
+    vaildate_cookies(request.cookies.get("access_token"))
+
+    # Use the database session within a 'with' statement
+    with db as session:
+        users = session.query(models.User).all()
+        return users

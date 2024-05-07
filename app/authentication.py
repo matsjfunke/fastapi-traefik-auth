@@ -2,7 +2,6 @@
 Mats Funke
 24.03.2024
 """
-import json
 import os
 
 from passlib.context import CryptContext
@@ -25,16 +24,13 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-with open("app/user_db.json", "r") as file:
-    json_db = json.load(file)
-
-
 def user_lookup(username: str, session: Session):
     existing_user = session.query(models.User).filter(models.User.username == username).first()
 
     if existing_user:
         username = existing_user.username
-        return username
+        hashed_password = existing_user.hashed_password
+        return username, hashed_password
     else:
         return None
 
@@ -44,10 +40,10 @@ def verify_password(password, hashed_password):
     return pwd_context.verify(password, hashed_password)
 
 
-def authenticate_user(username, password, json_db):
-    user_entry = user_lookup(username, json_db)
-    if user_entry and verify_password(password, user_entry["hashed_password"]):
-        return user_entry
+def authenticate_user(username: str, password: str, session: Session):
+    username, hashed_password = user_lookup(username, session)
+    if username and verify_password(password, hashed_password):
+        return username
 
     return None
 
