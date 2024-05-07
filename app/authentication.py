@@ -12,6 +12,10 @@ from typing import Union
 
 from fastapi import HTTPException, status
 
+from .db import models
+from sqlalchemy.orm import Session
+
+
 SECRET_KEY = os.environ.get("auth_secret_key")
 ALGORITHM = "HS256"
 # TODO: Consider implementing refresh tokens to obtain access without re-authenticating
@@ -25,11 +29,14 @@ with open("app/user_db.json", "r") as file:
     json_db = json.load(file)
 
 
-def user_lookup(username, json_db):
-    for entry in json_db["db"]:
-        if entry["username"] == username:
-            return entry
-    return None
+def user_lookup(username: str, session: Session):
+    existing_user = session.query(models.User).filter(models.User.username == username).first()
+
+    if existing_user:
+        username = existing_user.username
+        return username
+    else:
+        return None
 
 
 # pwd_context.verify is designed to resist timing attacks by taking a constant time regardless of whether the password matches or not

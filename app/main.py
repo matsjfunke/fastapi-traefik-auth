@@ -12,7 +12,7 @@ from starlette.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 # authentication imports
-from .authentication import authenticate_user, create_access_token, vaildate_cookies, ACCESS_TOKEN_EXPIRE_MINUTES, json_db
+from .authentication import authenticate_user, create_access_token, vaildate_cookies, ACCESS_TOKEN_EXPIRE_MINUTES, json_db, user_lookup
 from fastapi.security import OAuth2PasswordBearer
 
 # account creation imports
@@ -52,6 +52,15 @@ def get_db():
 
 # Create the tables
 models.Base.metadata.create_all(bind=database.engine)
+
+
+@app.post("/test")
+async def test_function(username: str = Form(...), db: Session = Depends(get_db)):
+    print("Test")
+    with db as session:
+        x = user_lookup(username, session)
+        print(x)
+    return {"user": x}
 
 
 @app.get("/", response_class=HTMLResponse)
