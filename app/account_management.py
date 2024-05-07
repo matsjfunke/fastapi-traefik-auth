@@ -8,6 +8,7 @@ from passlib.context import CryptContext
 import re
 from .db import models
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import NoResultFound
 from fastapi import HTTPException
 
 
@@ -47,3 +48,13 @@ def save_new_user(username: str, password: str, session: Session):
     session.commit()
     session.refresh(new_user)
     return new_user
+
+
+def delete_user(username: str, session: Session):
+    try:
+        user_to_delete = session.query(models.User).filter_by(username=username).one()
+        session.delete(user_to_delete)
+        session.commit()
+        return HTTPException(status_code=200, detail=f"The user: {username} was deleted from the database")
+    except NoResultFound:
+        return HTTPException(status_code=400, detail=f"The user: {username} you are trying to delete doesn't exist")

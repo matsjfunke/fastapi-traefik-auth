@@ -15,8 +15,8 @@ from fastapi.templating import Jinja2Templates
 from .authentication import authenticate_user, create_access_token, vaildate_cookies, ACCESS_TOKEN_EXPIRE_MINUTES
 from fastapi.security import OAuth2PasswordBearer
 
-# account creation imports
-from .account_creation import create_new_user, save_new_user
+# database related imports
+from .account_management import create_new_user, save_new_user, delete_user
 from .db import models, database
 from .db.schemas import User
 from sqlalchemy.orm import Session
@@ -121,3 +121,12 @@ async def get_all_users(request: Request, db: Session = Depends(get_db)):
     with db as session:
         users = session.query(models.User).all()
         return users
+
+
+@app.post("/delete_user")
+async def delete_user_credentails(request: Request, username: str = Form(...), db: Session = Depends(get_db)):
+    vaildate_cookies(request.cookies.get("access_token"))
+
+    with db as session:
+        status = delete_user(username, session)
+    return status

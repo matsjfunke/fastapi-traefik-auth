@@ -12,6 +12,11 @@
     <h1>Hello {{ username }}</h1>
     <p>your favorite cookie : {{ access_token }}</p>
         
+    <form action="/delete_user" method="POST" enctype="application/x-www-form-urlencoded">
+        <!-- Hidden input field to send username -->
+        <input type="hidden" id="usernameInput" name="username" value="{{ username }}">
+        <button type="submit">Delete your account</button>
+    </form>
 </body>
 
 </html>
