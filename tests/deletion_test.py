@@ -26,11 +26,11 @@ def get_db():
 
 
 with get_db() as db:
-    delete_user("user1", db)
+    delete_user("user2", db)
 
 # Querying the database for the deleted user
 with get_db() as db:
-    existing_user = db.query(models.User).filter(models.User.username == "user1").first()
+    existing_user = db.query(models.User).filter(models.User.username == "user2").first()
 
 if existing_user:
     username = existing_user.username

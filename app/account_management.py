@@ -8,7 +8,7 @@ from passlib.context import CryptContext
 import re
 from .db import models
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound, IntegrityError
 from fastapi import HTTPException
 
 
@@ -57,9 +57,12 @@ def update_username(existing_username: str, new_username: str, session: Session)
         # Update the username
         user_to_update.username = new_username
         session.commit()
-        return HTTPException(status_code=200, detail=f"Username updated from {existing_username} to {new_username}")
+        return HTTPException(status_code=200, detail=f"Username: {existing_username} was updated to {new_username}")
     except NoResultFound:
         return HTTPException(status_code=400, detail=f"The user: {existing_username} you are trying to update doesn't exist")
+    except IntegrityError:
+        session.rollback()  # Rollback the session to avoid leaving it in an inconsistent state
+        return HTTPException(status_code=400, detail=f"Failed to update username. The new username '{new_username}' is already taken.")
 
 
 def delete_user(username: str, session: Session):
