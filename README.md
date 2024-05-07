@@ -18,7 +18,7 @@ is a simple example / template for authentication (login)
 
 ## Quick start / Usage
 
-### local without reverse-proxy
+#### 1. run local without reverse-proxy
 - cloe repo
 ```bash
 git clone https://github.com/matsjfunke/fastapi-login-traefik.git
@@ -30,7 +30,8 @@ docker-compose -f docker-compose.yml up --build
 - than access the localhost:8000 and submit username and password, then enter your credentials at localhost:8000/login 
 - now with the cookies you obtained through logging in you can access the /hello and /users endpoints
  
-### on server
+
+#### 2. run on server
 - clone repo
 - change line 34 of docker.compose.staging.yml
     - "traefik.http.routers.db-access.rule=Host(`your-domain.com`)" # change `your-domain.com` to your domain
