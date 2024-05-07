@@ -37,7 +37,7 @@ docker-compose -f docker-compose.staging.yml up
 ```
 - than access the page https:/your-domain.com and enter the credentails "user1" and "foo" from the [json-db](https://github.com/matsjfunke/fastapi-login-traefik/blob/main/app/user_db.json)
 
-### Add new users to the database
+### Add new users to the JSON database
 - uncomment the password_encryption route as explained in the main.py 
 - access localhost:8000/create-password
 - enter new password
@@ -45,6 +45,14 @@ docker-compose -f docker-compose.staging.yml up
 - add hashed password and new username in json-db
 - docker-compose up -> login in with them
 
+### Add new users to sqlite database
+- start container:
+  docker-compose up --build
+- access localhost:8000:
+  enter username and password
+- vaildate account creation / get list of all users in the database:
+  access localhost:8000/users/
+  
 ## Test
 use the test script to check if the login works
 ```bash
