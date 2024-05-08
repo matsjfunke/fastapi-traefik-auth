@@ -14,7 +14,6 @@ from fastapi.templating import Jinja2Templates
 
 # authentication imports
 from .authentication import authenticate_user, create_access_token, vaildate_cookies, ACCESS_TOKEN_EXPIRE_MINUTES
-from fastapi.security import OAuth2PasswordBearer
 
 # database related imports
 from .account_management import create_new_user, save_new_user, update_username, delete_user
@@ -30,8 +29,6 @@ app = FastAPI()
 # Initialize template directory relative to the current file location
 current_dir = os.path.dirname(os.path.realpath(__file__))
 templates = Jinja2Templates(directory=os.path.join(current_dir, "templates"))
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 # Dependency to get the database session
