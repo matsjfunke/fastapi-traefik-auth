@@ -1,0 +1,12 @@
+# Node.js files
+node_modules/
+
+# Compiled output
+/build/
+/dist/
+
+# Environment variables
+.env
+
+# macOS files
+.DS_Store
