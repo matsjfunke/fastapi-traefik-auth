@@ -1,35 +1,43 @@
 """
 matsjfunke
-07.05.2024
+13.05.2024
 """
-from selenium import webdriver
-from selenium.webdriver.common.by import By
+import os
+import sys
 
-# options = webdriver.FirefoxOptions()
-# options.headless = True
+# Add the parent directory of the current file to the Python path for app imports to work
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
 
-driver = webdriver.Firefox()  # options=options
+from app.db.database import SessionLocal
+from app.db import models
+from contextlib import contextmanager
+from app.account_management import create_new_user, save_new_user
 
-port = 8000
-driver.get(f"http://127.0.0.1:{port}/login")
+
+@contextmanager
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
-username_field = driver.find_element(By.NAME, "username")
-password_field = driver.find_element(By.NAME, "password")
-submit_button = driver.find_element(By.ID, "submit")
+username = input("enter username: ")
+password = input("enter password: ")
 
-username_field.send_keys("user1")
-password_field.send_keys("foo")
+with get_db() as session:
+    username, password = create_new_user(username, password, session)
+    new_user = save_new_user(username, password, session)
 
-submit_button.click()
+    # Querying the database for the submitted user
+    existing_user = session.query(models.User).filter(models.User.username == "user1").first()
 
-print(driver.current_url)
-if f"http://127.0.0.1:{port}/hello?username=user1" == driver.current_url:
-    print("Login successful!")
-elif "http://127.0.0.1/hello?username=user1" == driver.current_url:
-    print("Login successful!")
+if existing_user:
+    username = existing_user.username
+    hashed_password = existing_user.hashed_password
+    print(f"Username: {username} and hashed_password: {hashed_password} have been saved to the database.")
 else:
-    print("Login failed.")
-
-driver.implicitly_wait(5)
-driver.quit()
+    print("Sign up failed, user is not saved in the database.")
