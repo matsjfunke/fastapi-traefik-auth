@@ -13,7 +13,7 @@ sys.path.append(parent_dir)
 from app.db.database import SessionLocal
 from app.db import models
 from contextlib import contextmanager
-from app.account_management import create_new_user, save_new_user
+from app.authentication import authenticate_user
 
 
 @contextmanager
@@ -29,15 +29,14 @@ username = input("enter username: ")
 password = input("enter password: ")
 
 with get_db() as session:
-    username, password = create_new_user(username, password, session)
-    new_user = save_new_user(username, password, session)
+    authenticated_username = authenticate_user(username, password, session)
+    if username is None:
+        print("Incorrect username or password")
 
     # Querying the database for the submitted user
     existing_user = session.query(models.User).filter(models.User.username == "user1").first()
 
 if existing_user:
-    username = existing_user.username
-    hashed_password = existing_user.hashed_password
-    print(f"Username: {username} and hashed_password: {hashed_password} have been saved to the database.")
+    print("user {username} is loggined in")
 else:
-    print("Sign up failed, user is not saved in the database.")
+    print("Login failed, user is not saved in the database.")

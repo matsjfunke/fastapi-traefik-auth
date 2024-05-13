@@ -36,11 +36,6 @@ app.add_middleware(
 )
 
 
-# # Initialize template directory relative to the current file location
-# current_dir = os.path.dirname(os.path.realpath(__file__))
-# templates = Jinja2Templates(directory=os.path.join(current_dir, "templates"))
-
-
 # Dependency to get the database session
 @contextmanager
 def get_db():
@@ -77,8 +72,8 @@ async def login(username: str = Form(...), password: str = Form(...), db: Sessio
     print(f"authenticating user: {username}")
 
     with db as session:
-        username = authenticate_user(username, password, session)
-        if username is None:
+        auth_username = authenticate_user(username, password, session)
+        if auth_username is None:
             raise HTTPException(
                 status_code=401,
                 detail="Incorrect username or password",
@@ -89,13 +84,15 @@ async def login(username: str = Form(...), password: str = Form(...), db: Sessio
         response = RedirectResponse(redirect_url)
         response.set_cookie(key="access_token", value=access_token)
 
-        print(f"user: {username} is logged in\n")
+        print(f"user: {auth_username} is logged in, with token: {access_token}\n")
         return response
 
 
 # Endpoint to get all users
 @app.get("/users/", response_model=List[User])
 async def get_all_users(request: Request, db: Session = Depends(get_db)):
+
+    # vaildate_cookies protects this endpoint
     vaildate_cookies(request.cookies.get("access_token"))
 
     with db as session:
@@ -107,6 +104,7 @@ async def get_all_users(request: Request, db: Session = Depends(get_db)):
 @app.post("/update-username")
 async def update_username_in_db(request: Request, old_username: str = Form(...), new_username: str = Form(...), db: Session = Depends(get_db)):
 
+    # vaildate_cookies protects this endpoint
     vaildate_cookies(request.cookies.get("access_token"))
 
     with db as session:
@@ -119,6 +117,8 @@ async def update_username_in_db(request: Request, old_username: str = Form(...),
 # Delete user endpoint
 @app.post("/delete-user")
 async def delete_user_in_db(request: Request, response: Response, username: str = Form(...), db: Session = Depends(get_db)):
+
+    # vaildate_cookies protects this endpoint
     vaildate_cookies(request.cookies.get("access_token"))
 
     with db as session:
