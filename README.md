@@ -69,3 +69,6 @@ python tests/update_name_test.py
 ```bash
 python test/deletion_test.py
 ```
+
+## API example without frontend stuff
+check /stand-alone-frontend
