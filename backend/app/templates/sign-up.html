@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="author" content="matsjfunke"/>
+    <title>Sign Up</title>
+</head>
+
+<body>
+
+    <h1>Enter username and password to create an account</h1>
+
+    <form action="/sign-up" method="POST" enctype="application/x-www-form-urlencoded">
+        <input type="text" name="username" placeholder="username (min 3 characters)">
+        <input type="password" name="password" placeholder="password (min 3 characters)">
+        <input type="submit" value="Submit" id="submit">
+    </form>
+
+    <a href="login" class="btn">already have an account? sign-in</a>
+
+</body>
+
+</html>

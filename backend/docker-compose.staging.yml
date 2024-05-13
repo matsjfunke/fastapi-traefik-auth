@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+
+  traefik:
+    image: traefik:v2.5
+    container_name: reverse-proxy 
+    command:
+      - "--api.insecure=true"   # Disable this in production
+      - "--providers.docker=true"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"  # Path to store Let's Encrypt certificates
+
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./letsencrypt:/letsencrypt"
+
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    command: gunicorn -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 --timeout 480 app.main:app
+    volumes:
+      - .:/app/
+    image: db-access-image
+    container_name: app-container
+    ports:
+      - 8011:8000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.db-access.rule=Host(your-domain.com)" # change your-domain.com to your domain
+      - "traefik.http.routers.db-access.entrypoints=websecure"
+      - "traefik.http.services.db-access.loadbalancer.server.port=8000"
+      - "traefik.http.routers.db-access.tls.certresolver=myresolver"  # Use the same resolver name as defined in Traefik
+    env_file:
+      - ./app/.env.dev
