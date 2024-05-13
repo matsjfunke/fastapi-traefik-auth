@@ -8,9 +8,10 @@ services:
     command:
       - "--api.insecure=true"   # Disable this in production
       - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"  # Path to store Let's Encrypt certificates
+
     ports:
       - "80:80"
       - "443:443"
