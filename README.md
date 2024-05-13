@@ -25,6 +25,7 @@ git clone https://github.com/matsjfunke/fastapi-login-traefik.git
 ```
 - start container
 ```bash
+cd auth-with-frontend
 docker-compose -f docker-compose.yml up --build
 ```
 - than access the localhost:8000 and submit username and password, then enter your credentials at localhost:8000/login 
@@ -39,6 +40,7 @@ docker-compose -f docker-compose.yml up --build
 - start docker 
 ```bash
 git clone https://github.com/matsjfunke/fastapi-login-traefik.git
+cd auth-with-frontend
 docker-compose -f docker-compose.staging.yml up
 ```
 - than access the `your-domain.com` and submit username and password, then enter your credentials at `your-domain.com/login` 
@@ -49,9 +51,10 @@ docker-compose -f docker-compose.staging.yml up
 test all CRUD functions in this order
 1. install dependency’s
 ```bash
+cd auth-with-frontend
 python3 -m venv env
 source env/bin/activate
-pip install selenium
+pip install -r tests/requirements.txt
 ```
 2. test if user credentials get saved to db
 ```bash

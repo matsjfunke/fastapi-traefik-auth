@@ -25,16 +25,18 @@ def get_db():
         db.close()
 
 
+username = "user2"
+
 with get_db() as db:
-    delete_user("user2", db)
+    delete_user(username, db)
 
 # Querying the database for the deleted user
 with get_db() as db:
-    existing_user = db.query(models.User).filter(models.User.username == "user2").first()
+    existing_user = db.query(models.User).filter(models.User.username == username).first()
 
 if existing_user:
-    username = existing_user.username
+    to_delete_user = existing_user.username
     hashed_password = existing_user.hashed_password
     print(f"Username: {username} still in the database.")
 else:
-    print("User has been deleted from the database.")
+    print(f"User {username} has been deleted from the database.")
