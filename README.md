@@ -3,7 +3,9 @@
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
 
-is a simple example / template for authentication   
+is a simple example / template for authentication
+1. [auth-with-frontend](auth-with-frontend) uses Jinja2 templates to serve HTML to the client.
+2. [stand-alone-backend](stand-alone-backend) uses CORS to allow cross-origin requests, enabling the backend to communicate with frontend applications hosted on different domains.
 
 ## Technology Stack and Features
 - ⚡ [FastAPI](https://fastapi.tiangolo.com) for building APIs with Python 3.7+.
